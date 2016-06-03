@@ -1,0 +1,63 @@
+Option Explicit
+
+'-----------------------------------
+Sub insertRowNCopy()
+'
+' sub to insert 2 new lines after each _
+  line and copy A:E to new line.
+'------------------------------------
+    Dim rIn As Range
+    Dim lR As Long
+    
+    'assume rows start at A1
+    
+    Set rIn = Range("A1")
+    lR = rIn.CurrentRegion.Rows.Count
+    
+    ' we will work from bottom to top
+    Do While lR > 0
+        rIn.Offset(lR, 0).EntireRow.Insert
+        'copy the data accross. don't use copy/paste, just set the values
+        rIn.Offset(lR, 0).Resize(1, 10).FormulaR1C1 = rIn.Offset(lR - 1, 0).Resize(1, 10).FormulaR1C1
+        rIn.Offset(lR - 1, 9).Value = -rIn.Offset(lR - 1, 9).Value
+        lR = lR - 1
+    Loop
+    
+    Set rIn = Nothing
+End Sub
+
+
+
+--------------------------------------------------------------------------------------------------------------
+
+
+Sub test()    
+Dim j As Long, r As Range    
+j = InputBox("2")    
+Set r = Range("A1")    
+Do    
+Range(r.Offset(1, 0), r.Offset(j, 0)).EntireRow.Insert    
+Set r = Cells(r.Row + j + 1, 1)    
+MsgBox r.Address    
+If r.Offset(1, 0) = "" Then Exit Do    
+Loop    
+
+End Sub
+
+
+--------------------------------------------------------------------------------------------------------------
+
+Sub InsertRowsandCopyContent()
+    Dim r As Integer, Count As Integer
+    Application.ScreenUpdating = False
+    Count = Range("a65536").End(xlUp).Row
+    For r = Count To 2 Step -1    ' work backwards to account for added lines
+        If Cells(r, 1) <> vbNullString Then  ' skip blank lines
+            ActiveSheet.Rows(r + 1).Insert
+            ActiveSheet.Rows(r + 1).Insert
+            ActiveSheet.Rows(r).Copy Destination:=ActiveSheet.Rows(r + 1)
+ActiveSheet.Rows(r).Copy Destination:=ActiveSheet.Rows(r + 2)
+        End If
+    Next r
+    Application.ScreenUpdating = True
+End Sub
